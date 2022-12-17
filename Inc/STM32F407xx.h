@@ -34,13 +34,13 @@
 #ifndef __STM32F407xx_H
 #define __STM32F407xx_H
 
-#ifdef __cplusplus
- extern "C" {
-#endif /* __cplusplus */
+//#ifdef __cplusplus
+// extern "C"
+//#endif /* __cplusplus */
 
 
 
- /* here i am write the identifier */
+ /* enable and disable Macros*/
 
 #define __IO volatile
 
@@ -53,6 +53,8 @@
 
 #define    GPIO_PIN_RESET       RESET
 #define    GPIO_PIN_SET         SET
+
+/* End Macros */
 
 /** @addtogroup Configuration_section_for_CMSIS
   * @{
@@ -497,6 +499,8 @@ typedef struct
 {
   __IO uint32_t BWTR[7];    /*!< NOR/PSRAM write timing registers, Address offset: 0x104-0x11C */
 } FSMC_Bank1E_TypeDef;
+
+
 
 /**
   * @brief Flexible Static Memory Controller Bank2
@@ -1002,6 +1006,8 @@ typedef struct
 #define GPIOG_BASE            (AHB1PERIPH_BASE + 0x1800UL)
 #define GPIOH_BASE            (AHB1PERIPH_BASE + 0x1C00UL)
 #define GPIOI_BASE            (AHB1PERIPH_BASE + 0x2000UL)
+#define GPIOJ_BASE            (AHB1PERIPH_BASE + 0x2400UL)
+#define GPIOK_BASE            (AHB1PERIPH_BASE + 0x2800UL)
 #define CRC_BASE              (AHB1PERIPH_BASE + 0x3000UL)
 #define RCC_BASE              (AHB1PERIPH_BASE + 0x3800UL)
 #define FLASH_R_BASE          (AHB1PERIPH_BASE + 0x3C00UL)
@@ -1123,6 +1129,8 @@ typedef struct
 #define GPIOG               ((GPIO_TypeDef *) GPIOG_BASE)
 #define GPIOH               ((GPIO_TypeDef *) GPIOH_BASE)
 #define GPIOI               ((GPIO_TypeDef *) GPIOI_BASE)
+#define GPIOJ               ((GPIO_TypeDef *) GPIOJ_BASE)
+#define GPIOK               ((GPIO_TypeDef *) GPIOK_BASE)
 #define CRC                 ((CRC_TypeDef *) CRC_BASE)
 #define RCC                 ((RCC_TypeDef *) RCC_BASE)
 #define FLASH               ((FLASH_TypeDef *) FLASH_R_BASE)
@@ -15600,55 +15608,43 @@ typedef struct
 
 /* peripheral clock enable */
 
-#define GPIOA_CLOCK_ENABLE()          (RCC->AHB1ENR | (1<<0))   //GPIOA clock enable
-#define GPIOB_CLOCK_ENABLE()          (RCC->AHB1ENR | (1<<1))   //GPIOB clock enable
-#define GPIOC_CLOCK_ENABLE()          (RCC->AHB1ENR | (1<<2))   //GPIOC clock enable
-#define GPIOD_CLOCK_ENABLE()          (RCC->AHB1ENR | (1<<3))   //GPIOD clock enable
-#define GPIOE_CLOCK_ENABLE()          (RCC->AHB1ENR | (1<<4))   //GPIOE clock enable
-#define GPIOF_CLOCK_ENABLE()          (RCC->AHB1ENR | (1<<5))   //GPIOF clock enable
-#define GPIOG_CLOCK_ENABLE()          (RCC->AHB1ENR | (1<<6))   //GPIOG clock enable
-#define GPIOH_CLOCK_ENABLE()          (RCC->AHB1ENR | (1<<7))   //GPIOH clock enable
-#define GPIOI_CLOCK_ENABLE()          (RCC->AHB1ENR | (1<<8))   //GPIOI clock enable
-#define GPIOJ_CLOCK_ENABLE()          (RCC->AHB1ENR | (1<<9))   //GPIOJ clock enable
-#define GPIOK_CLOCK_ENABLE()          (RCC->AHB1ENR | (1<<10))   //GPIOK clock enable
+#define GPIOA_CLOCK_ENABLE()          (RCC->AHB1ENR |= (1<<0))   //GPIOA clock enable
+#define GPIOB_CLOCK_ENABLE()          (RCC->AHB1ENR |= (1<<1))   //GPIOB clock enable
+#define GPIOC_CLOCK_ENABLE()          (RCC->AHB1ENR |= (1<<2))   //GPIOC clock enable
+#define GPIOD_CLOCK_ENABLE()          (RCC->AHB1ENR |= (1<<3))   //GPIOD clock enable
+#define GPIOE_CLOCK_ENABLE()          (RCC->AHB1ENR |= (1<<4))   //GPIOE clock enable
+#define GPIOF_CLOCK_ENABLE()          (RCC->AHB1ENR |= (1<<5))   //GPIOF clock enable
+#define GPIOG_CLOCK_ENABLE()          (RCC->AHB1ENR |= (1<<6))   //GPIOG clock enable
+#define GPIOH_CLOCK_ENABLE()          (RCC->AHB1ENR |= (1<<7))   //GPIOH clock enable
+#define GPIOI_CLOCK_ENABLE()          (RCC->AHB1ENR |= (1<<8))   //GPIOI clock enable
+#define GPIOJ_CLOCK_ENABLE()          (RCC->AHB1ENR |= (1<<9))   //GPIOJ clock enable
+#define GPIOK_CLOCK_ENABLE()          (RCC->AHB1ENR |= (1<<10))   //GPIOK clock enable
 
 
+#define SYSCFG_CLOCK_ENABLE()          (RCC->APB2ENR |= (1<<14))   //GPIOK clock enable
 
 /* peripheral clock disable */
 
-#define GPIOA_CLOCK_DISABLE()             do{(RCC->AHB1RSTR | 1<<0); (RCC->AHB1RSTR &= ~(1<<0))} while(0)
-#define GPIOB_CLOCK_DISABLE()             do{(RCC->AHB1RSTR | 1<<1); (RCC->AHB1RSTR &= ~(1<<1))} while(0)
-#define GPIOC_CLOCK_DISABLE()             do{(RCC->AHB1RSTR | 1<<2); (RCC->AHB1RSTR &= ~(1<<2))} while(0)
-#define GPIOD_CLOCK_DISABLE()             do{(RCC->AHB1RSTR | 1<<3); (RCC->AHB1RSTR &= ~(1<<3))} while(0)
-#define GPIOE_CLOCK_DISABLE()             do{(RCC->AHB1RSTR | 1<<4); (RCC->AHB1RSTR &= ~(1<<4))} while(0)
-#define GPIOF_CLOCK_DISABLE()             do{(RCC->AHB1RSTR | 1<<5); (RCC->AHB1RSTR &= ~(1<<5))} while(0)
-#define GPIOG_CLOCK_DISABLE()             do{(RCC->AHB1RSTR | 1<<6); (RCC->AHB1RSTR &= ~(1<<6))} while(0)
-#define GPIOH_CLOCK_DISABLE()             do{(RCC->AHB1RSTR | 1<<7); (RCC->AHB1RSTR &= ~(1<<7))} while(0)
-#define GPIOI_CLOCK_DISABLE()             do{(RCC->AHB1RSTR | 1<<8); (RCC->AHB1RSTR &= ~(1<<8))} while(0)
-#define GPIOJ_CLOCK_DISABLE()             do{(RCC->AHB1RSTR | 1<<9); (RCC->AHB1RSTR &= ~(1<<9))} while(0)
-#define GPIOK_CLOCK_DISABLE()             do{(RCC->AHB1RSTR | 1<<10); (RCC->AHB1RSTR &= ~(1<<10))} while(0)
+#define GPIOA_CLOCK_DISABLE()             do{(RCC->AHB1RSTR |= (1<<0));(RCC->AHB1RSTR &= ~(1<<0));}while(0)
+#define GPIOB_CLOCK_DISABLE()             do{(RCC->AHB1RSTR |= (1<<1)); (RCC->AHB1RSTR &= ~(1<<1));} while(0)
+#define GPIOC_CLOCK_DISABLE()             do{(RCC->AHB1RSTR |= (1<<2)); (RCC->AHB1RSTR &= ~(1<<2));} while(0)
+#define GPIOD_CLOCK_DISABLE()             do{(RCC->AHB1RSTR |= (1<<3)); (RCC->AHB1RSTR &= ~(1<<3));} while(0)
+#define GPIOE_CLOCK_DISABLE()             do{(RCC->AHB1RSTR |= (1<<4)); (RCC->AHB1RSTR &= ~(1<<4));} while(0)
+#define GPIOF_CLOCK_DISABLE()             do{(RCC->AHB1RSTR |= (1<<5)); (RCC->AHB1RSTR &= ~(1<<5));} while(0)
+#define GPIOG_CLOCK_DISABLE()             do{(RCC->AHB1RSTR |= (1<<6)); (RCC->AHB1RSTR &= ~(1<<6));} while(0)
+#define GPIOH_CLOCK_DISABLE()             do{(RCC->AHB1RSTR |= (1<<7)); (RCC->AHB1RSTR &= ~(1<<7));} while(0)
+#define GPIOI_CLOCK_DISABLE()             do{(RCC->AHB1RSTR |= (1<<8)); (RCC->AHB1RSTR &= ~(1<<8));} while(0)
+#define GPIOJ_CLOCK_DISABLE()             do{(RCC->AHB1RSTR |= (1<<9)); (RCC->AHB1RSTR &= ~(1<<9));} while(0)
+#define GPIOK_CLOCK_DISABLE()             do{(RCC->AHB1RSTR |= (1<<10)); (RCC->AHB1RSTR &= ~(1<<10));} while(0)
 
 
 
 
 
-/**
-  * @}
-  */
 
-/**
-  * @}
-  */
-
-/**
-  * @}
-  */
-
-#ifdef __cplusplus
-}
-#endif /* __cplusplus */
 
 #endif /* __STM32F407xx_H */
+
 
 
 

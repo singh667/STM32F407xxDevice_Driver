@@ -17,21 +17,70 @@
  ******************************************************************************
  */
 
-#include <iostream>
+
 #include <stdio.h>
-#include <STM32F407xx.h>
+#include "STM32F407xx.h"
 #include "STM32F407xx_gpio.h"
+
+
+
+
+
+
 
 
 int main(void)
 {
-	uint32_t _delayvalue=0;
+
+
+	gpio_handl_t GPIOLed,GPIOBtn;
+	GPIOLed.GPIO_PeripheralClockControle(GPIOD,ENABLE);
+
+
+	GPIOLed.pGPIOx=GPIOD;
+	GPIOLed.pGPIOx_Config.GPIO_PinNumber=GPIO_PIN_12;
+	GPIOLed.pGPIOx_Config.GPIO_PinMode=GPIO_MODE_OUTPUT;
+	GPIOLed.pGPIOx_Config.GPIO_PinSpeed=GPIO_HIGH_SPEED;
+
+
+	/* this is the pushpull configuration and no pull up and no pull down */
+	GPIOLed.pGPIOx_Config.GPIO_PinOutput=GPIO_OUTPUT_PUSHPULL;
+	/* this line i did not configure the pull up and pull down */
+	GPIOLed.pGPIOx_Config.GPIO_PinpullUpPd=GPIO_NPULLUP_NOPULLDOWN;
+
+	/* this is open drain configuration and internally i activate the pull up */
+	//GPIOLed.pGPIOx_Config.GPIO_PinOutput=GPIO_OUTPUT_OPENDRAIN;
+	//GPIOLed.pGPIOx_Config.GPIO_PinpullUpPd=GPIO_PULLP;
+
+	GPIOLed.GPIO_Init(GPIOLed);
+
+	GPIOBtn.GPIO_PeripheralClockControle(GPIOA,ENABLE);
+
+
+	GPIOBtn.pGPIOx=GPIOA;
+	GPIOBtn.pGPIOx_Config.GPIO_PinNumber=GPIO_PIN_0;
+	GPIOBtn.pGPIOx_Config.GPIO_PinMode=GPIO_MODE_INPUT;
+	GPIOBtn.pGPIOx_Config.GPIO_PinSpeed=GPIO_HIGH_SPEED;
+	GPIOBtn.pGPIOx_Config.GPIO_PinpullUpPd=GPIO_NPULLUP_NOPULLDOWN;
+
+
+	GPIOLed.GPIO_Init(GPIOBtn);
+
     /* Loop forever */
+
+	/*write the dummy code */
+
+
 	while(1){
 
-		printf("Hello STM");
-		for(_delayvalue=0;_delayvalue<1000;_delayvalue++);
+		if(GPIOBtn.GPIO_ReadFromInputPin(GPIOA,GPIO_PIN_0)==GPIO_PIN_SET){
+
+			GPIOLed.my_delay();
+			GPIOLed.GPIO_ToggleOutPutPin(GPIOD,GPIO_PIN_12);
+			//GPIOLed.my_delay();
+		}
+
 	}
 
-		//for(;;);
+	return 0;	//for(;;);
 }

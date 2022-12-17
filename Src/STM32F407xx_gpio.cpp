@@ -9,8 +9,13 @@
  *
  *
  */
+#ifndef _STM32F407XX_GPIO_CPP
+#define  _STM32F407XX_GPIO_CPP
+
 
 #include "STM32F407xx_gpio.h"
+
+
 
 /*  peripheral gpio declration */
 
@@ -31,12 +36,18 @@
 #define  GPIO_PIN_14        14
 #define  GPIO_PIN_15        15
 
+/* end of the GPIO declration */
 
 
 
 
-
-/* here we declare the mode registor of the GPIO pin */
+/* diffrrent mode of the GPIO pin  *
+ * @ these all macro related to the -->>>*GPIO port mode register (GPIOx_MODER) (x = A..I/J/K)*
+ * These bits are written by software to configure the I/O direction mode.
+   @ 00: Input (reset state)
+   @ 01: General purpose output mode
+   @ 10: Alternate function mode
+   @ 11: Analog mode*/
 
 
 #define GPIO_MODE_INP   0x00
@@ -44,11 +55,7 @@
 #define GPIO_MODE_ALT   0x10
 #define GPIO_MODE_ANL   0x11
 
-
-
-
-
-/* here we declare the mode type of Registor of the GPIO pin
+/************************ end of the GPIO mode registor ****************************************************/
 
 
 
@@ -61,10 +68,12 @@
 
 
 
-/* start all function defination */
+
+
+/* ******************start all function defination ******************************************************/
 
 /**********************************************************************************************************
- * @function name           :
+ * @function name           :  GPIO_PeripheralClockControle
  *
  * @description             :
  *
@@ -78,9 +87,9 @@
  *********************************************************************************************************/
 
 
-void gpio_handl_t::GPIO_PeripheralClockControle(GPIO_TypeDef *pGPIOx,uint8_t ENOrDi){
+void gpio_handl_t::GPIO_PeripheralClockControle(GPIO_TypeDef *pGPIOx,uint8_t EnOrDi){
 
-	if(ENOrDI==ENABLE){
+	if(EnOrDi==ENABLE){
 
 		if(pGPIOx==GPIOA){
 			GPIOA_CLOCK_ENABLE();
@@ -119,7 +128,7 @@ void gpio_handl_t::GPIO_PeripheralClockControle(GPIO_TypeDef *pGPIOx,uint8_t ENO
 
 			//No extera port is avaialable
 		}
-	}else if(ENorDI==DISABLE){
+	}else if(EnOrDi==DISABLE){
 
 		if(pGPIOx==GPIOA){
 			GPIOA_CLOCK_DISABLE();
@@ -178,7 +187,7 @@ void gpio_handl_t::GPIO_PeripheralClockControle(GPIO_TypeDef *pGPIOx,uint8_t ENO
  * @Note                    :
  *********************************************************************************************************/
 
-void gpio_handl_t::GPIO_Init(gpio_handl_t& gpio_handle){
+void gpio_handl_t::GPIO_Init(gpio_handl_t &gpio_handle){
 
 	uint32_t regTemp=0;
 
@@ -189,7 +198,32 @@ void gpio_handl_t::GPIO_Init(gpio_handl_t& gpio_handle){
 		gpio_handle.pGPIOx->MODER &= ~(0x3 << gpio_handle.pGPIOx_Config.GPIO_PinNumber);
 		gpio_handle.pGPIOx->MODER |= regTemp;
 	}else{
-		// will we do later for interrupt;
+
+		/* here we did the interrupt configuration */
+		if(gpio_handle.pGPIOx_Config.GPIO_PinMode==GPIO_MODE_IT_FT){
+
+			Exti->FTSR |= (1<<gpio_handle.pGPIOx_Config.GPIO_PinNumber);
+
+			Exti->RTSR &= ~(1<<gpio_handle.pGPIOx_Config.GPIO_PinNumber);
+			/* here we configure the falling edge trigger registor */
+
+		}else if(gpio_handle.pGPIOx_Config.GPIO_PinMode==GPIO_MODE_IT_RT){
+
+			/* here we configure the rising edge trigger */
+			Exti->RTSR |= (1<<gpio_handle.pGPIOx_Config.GPIO_PinNumber);
+
+			Exti->FTSR &= ~(1<<gpio_handle.pGPIOx_Config.GPIO_PinNumber);
+
+		}else if(gpio_handle.pGPIOx_Config.GPIO_PinMode==GPIO_MODE_IT_RFT){
+
+			/* here we configure the rising and falling edge trigger */
+			Exti->RTSR |= (1<<gpio_handle.pGPIOx_Config.GPIO_PinNumber);
+
+			Exti->FTSR |= (1<<gpio_handle.pGPIOx_Config.GPIO_PinNumber);
+		}
+
+
+		Exti->IMR |= (1<<gpio_handle.pGPIOx_Config.GPIO_PinNumber);
 	}
 
 
@@ -239,7 +273,7 @@ void gpio_handl_t::GPIO_Init(gpio_handl_t& gpio_handle){
 	 * @Note                    :
 	 *********************************************************************************************************/
 
-void GPIO_DeInit(GPIO_TypeDef *pGPIOx){
+void gpio_handl_t::GPIO_DeInit(GPIO_TypeDef *pGPIOx){
 
 
 
@@ -293,17 +327,13 @@ void GPIO_DeInit(GPIO_TypeDef *pGPIOx){
 	 * @Note                    :
 	 *********************************************************************************************************/
 
-
-uint8_t GPIO_ReadFromInputPin(GPIO_TypeDef *pGPIOx,uint8_t PinNumber){
+uint8_t gpio_handl_t::GPIO_ReadFromInputPin(GPIO_TypeDef *pGPIOx,uint8_t PinNumber){
 
 	uint8_t readRegValue=0;
 
 	readRegValue=((pGPIOx->IDR >> PinNumber) & 0x00000001);
 
 	return readRegValue;
-
-
-
 }
 
 
@@ -321,7 +351,16 @@ uint8_t GPIO_ReadFromInputPin(GPIO_TypeDef *pGPIOx,uint8_t PinNumber){
 	 * @Note                    :
 	 *********************************************************************************************************/
 
-	uint16_t GPIO_ReadFromInputPort(GPIO_TypeDef *pGPIOx);
+	uint16_t gpio_handl_t::GPIO_ReadFromInputPort(GPIO_TypeDef *pGPIOx){
+
+
+
+		uint8_t readRegValue=0;
+
+		readRegValue=pGPIOx->IDR ;
+
+		return readRegValue;
+	}
 
 
 
@@ -339,7 +378,15 @@ uint8_t GPIO_ReadFromInputPin(GPIO_TypeDef *pGPIOx,uint8_t PinNumber){
 	 * @Note                    :
 	 *********************************************************************************************************/
 
-	void GPIO_WriteToOutputPin(GPIO_TypeDef *pGPIOx,uint8_t PinNumber,unit8_t Value);
+	void gpio_handl_t::GPIO_WriteToOutputPin(GPIO_TypeDef *pGPIOx,uint8_t PinNumber,uint8_t Value){
+
+		if(Value==GPIO_PIN_SET){
+			pGPIOx->ODR |= (Value<<PinNumber);
+		}else{
+			pGPIOx->ODR &=(Value<<PinNumber);
+		}
+
+	}
 
 
 
@@ -357,7 +404,10 @@ uint8_t GPIO_ReadFromInputPin(GPIO_TypeDef *pGPIOx,uint8_t PinNumber){
 	 * @Note                    :
 	 *********************************************************************************************************/
 
-	void GPIO_WriteToOutputPort(GPIO_TypeDef *pGPIOx,uint16_t Value);
+	void gpio_handl_t::GPIO_WriteToOutputPort(GPIO_TypeDef *pGPIOx,uint16_t Value){
+
+		pGPIOx->ODR =Value;
+	}
 
 
 	/**********************************************************************************************************
@@ -374,7 +424,12 @@ uint8_t GPIO_ReadFromInputPin(GPIO_TypeDef *pGPIOx,uint8_t PinNumber){
 	 * @Note                    :
 	 *********************************************************************************************************/
 
-	void GPIO_ToggleOutPutPin(GPIO_TypeDef *pGPIOx,uint8_t PinNumber);
+	void gpio_handl_t::GPIO_ToggleOutPutPin(GPIO_TypeDef *pGPIOx,uint8_t PinNumber){
+
+		pGPIOx->ODR ^= (1<<PinNumber);
+
+
+	}
 
 
 
@@ -392,7 +447,10 @@ uint8_t GPIO_ReadFromInputPin(GPIO_TypeDef *pGPIOx,uint8_t PinNumber){
 	 * @Note                    :
 	 *********************************************************************************************************/
 
-	void GPIO_IRQConfig(uint8_t IRQNUmber,uint8_t IRQPriority,unit8_t EnorDi);
+	void gpio_handl_t::GPIO_IRQConfig(uint8_t IRQNUmber,uint8_t IRQPriority,uint8_t EnorDi){
+
+
+	}
 
 
 
@@ -410,4 +468,14 @@ uint8_t GPIO_ReadFromInputPin(GPIO_TypeDef *pGPIOx,uint8_t PinNumber){
 	 * @Note                    :
 	 *********************************************************************************************************/
 
-	void GPIO_IRQHandling(uint8_t PinNumber);
+void gpio_handl_t::GPIO_IRQHandling(uint8_t PinNumber){
+
+}
+
+void gpio_handl_t::my_delay(){
+
+	uint32_t i=0;
+    for(i=0;i<500000;i++);
+
+}
+#endif
